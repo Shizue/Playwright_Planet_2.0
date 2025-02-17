@@ -1,0 +1,1 @@
+Start-Process "msedge.exe" "{C:\Users\Shizue\Documents\workspace\Playwright_Planet_2.0\data\banking.html}
