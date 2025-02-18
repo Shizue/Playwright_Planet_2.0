@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export class TransferFundPage {
   page: Page;
@@ -11,6 +11,8 @@ export class TransferFundPage {
   spinAmount = "Amount:";
   lblCurrency = "Currency:";
   btnTransferFunds = "Transfer Funds";
+  messageSuccess = "Transfer Successful!";
+  transactionID = "Transaction ID: TXN98765";
 
   constructor(page: Page) {
     this.page = page;
@@ -25,18 +27,53 @@ export class TransferFundPage {
     }
   }
 
-  // async isHeader() {
-  //   return this.page.getByRole('heading', { name: this.lblHeader }).isVisible()
-  // }
-
-
-
   // Fill login form
   async fill(strFromAccount: string, strToAccount: string, strAmount: string, strCurrency: string) {
     await this.page.getByRole('textbox', { name: this.txtFromAccount }).fill(strFromAccount);
     await this.page.getByRole('textbox', { name: this.txtToAccount }).fill(strToAccount);
-    await this.page.getByRole('spinbutton', { name: this.spinAmount }).fill(strAmount);
-    await this.page.getByLabel(this.lblCurrency).selectOption(strAmount);
+    await this.page.getByRole('spinbutton', { name: this.spinAmount }).type(strAmount);
+    await this.page.getByLabel(this.lblCurrency).selectOption(strCurrency);
+  }
+
+  async filInvalidAmoutData(strFromAccount: string, strToAccount: string, strCurrency: string) {
+    await this.page.getByRole('textbox', { name: this.txtFromAccount }).fill(strFromAccount);
+    await this.page.getByRole('textbox', { name: this.txtToAccount }).fill(strToAccount);
+    await this.fillEmptyAmountData();
+    await this.fillNumberAndCharValidAmoutData();
+    await this.fillValidAmoutNumberType();
+    await this.fillManualInvalidAmoutData();
+    await this.page.getByLabel(this.lblCurrency).selectOption(strCurrency);
+  }
+
+  async fillEmptyAmountData() {
+    const spinButton = this.page.getByRole('spinbutton', { name: this.spinAmount });
+    // Attempt to type invalid characters
+    await spinButton.click();
+    await this.page.keyboard.type("abc!@#");
+    const inputValue = await spinButton.inputValue();
+    console.log("Input Value After Typing:", inputValue);
+    // Expect the field to remain empty or unchanged
+    await expect(spinButton).toHaveValue("");
+  }
+
+  async fillNumberAndCharValidAmoutData() {
+    const spinButton = this.page.getByRole('spinbutton', { name: this.spinAmount });
+    await spinButton.click();
+    await this.page.keyboard.type("123abc!@#");
+    // Validate that only "123" remains in the field
+    await expect(spinButton).toHaveValue("123");
+  }
+
+  async fillValidAmoutNumberType() {
+    const spinButton = this.page.getByRole('spinbutton', { name: this.spinAmount });
+    const inputType = await spinButton.getAttribute("type");
+    expect(inputType).toBe("number");
+  }
+
+  async fillManualInvalidAmoutData() {
+    const spinButton = this.page.getByRole('spinbutton', { name: this.spinAmount });
+    await spinButton.click();
+    await this.page.keyboard.type("abc123!@#");
   }
 
   async submitForm() {
@@ -64,13 +101,13 @@ export class TransferFundPage {
   }
 
   async isFromAccountVisible() {
-    return this.page.getByRole('textbox', { name: this.txtFromAccount}).isVisible();
+    return this.page.getByRole('textbox', { name: this.txtFromAccount }).isVisible();
   }
   async isLblToAccountVisible() {
     return this.page.getByText(this.txtToAccount).isVisible();
   }
   async isToAccountVisible() {
-    return this.page.getByRole('textbox', { name: this.txtToAccount}).isVisible();
+    return this.page.getByRole('textbox', { name: this.txtToAccount }).isVisible();
   }
 
   async isAmountVisible() {
@@ -78,7 +115,7 @@ export class TransferFundPage {
   }
 
   async isCurrencyVisible() {
-    return this.page.getByRole('textbox', { name: this.txtToAccount}).isVisible();
+    return this.page.getByRole('textbox', { name: this.txtToAccount }).isVisible();
   }
 
   async isTxtAmountVisible() {
@@ -86,7 +123,7 @@ export class TransferFundPage {
   }
 
   async isSpinBtnAmountVisible() {
-    return this.page.getByRole('spinbutton', { name: this.spinAmount}).isVisible();
+    return this.page.getByRole('spinbutton', { name: this.spinAmount }).isVisible();
   }
 
   async isTxtCurrencyVisible() {
@@ -99,12 +136,14 @@ export class TransferFundPage {
   }
 
   async isBtnTransferFundsVisible() {
-    return this.page.getByRole('button', { name: this.btnTransferFunds}).isVisible();
+    return this.page.getByRole('button', { name: this.btnTransferFunds }).isVisible();
   }
 
-  // Validate login success
-  async isLoginSuccessful() {
-  return this.page.getByText('Transfer Successful!').isVisible()
+  async getTransactionID() {
+    return this.page.getByText(this.transactionID).textContent();
+  }
+  async getMessageSuccess() {
+    return this.page.getByText(this.messageSuccess).textContent();
+  }
 
-}
 }
