@@ -1,1 +1,33 @@
-Start-Process "msedge.exe" "{C:\Users\Shizue\Documents\workspace\Playwright_Planet_2.0\data\banking.html}
+ UI Test and API test in Playwrite 
+## Reports
+
+folder: test-results
+## Get Started
+
+### Setup:
+
+1. Clone or download the project
+2. Extract and open in the VS-Code
+3. `npm i` to install the dependencies
+4. `npx playwright install` to install the browsers
+5. `npm run test` to execute the tests
+
+
+### Folder structure
+0. `src\pages` -> All the page (UI screen)
+1. `src\test\features` -> write your features here
+2. `src\test\steps` -> Your step definitions goes here
+3. `src\hooks\hooks.ts` -> Browser setup and teardown logic
+4. `src\hooks\pageFixture.ts` -> Simple way to share the page objects to steps
+5. `src\test-result` -> To generate the report
+6. `cucumber.json` -> One file to do all the magic
+7. `package.json` -> Contains all the dependencies
+
+
+### Performance Test in Gatling
+1. go to the gatling folder
+2. run the command ` npx gatling run --typescript --simulation APIBanking`
+3. check the report in the `/target/gatling/results` folder
+
+4. run the command ` npx gatling run --typescript --simulation banking`
+5. check the report in the `/target/gatling/results` folder
